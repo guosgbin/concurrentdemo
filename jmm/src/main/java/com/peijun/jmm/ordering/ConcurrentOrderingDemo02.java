@@ -8,7 +8,7 @@ import org.openjdk.jcstress.infra.results.I_Result;
  * 测试有序性
  */
 @JCStressTest
-@Outcome(id = {"0, 1", "1, 0", "1, 1"}, expect = Expect.ACCEPTABLE, desc = "NOT ORDERING")
+@Outcome(id = {"0, 1", "2, 0", "2, 1"}, expect = Expect.ACCEPTABLE, desc = "NOT ORDERING")
 @Outcome(id = {"0, 0"}, expect = Expect.ACCEPTABLE_INTERESTING, desc = "HAD ORDERING")
 @State
 public class ConcurrentOrderingDemo02 {
@@ -21,17 +21,17 @@ public class ConcurrentOrderingDemo02 {
             r.r1 = b;
         });
         Thread two = new Thread(() -> {
-            b = 1;
+            b = 2;
             r.r2 = a;
         });
-        two.start();
-        one.start();
         try {
+            one.start();
+            two.start();
             // 先执行线程1 再执行线程2
             one.join();
             two.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+
         }
     }
 }

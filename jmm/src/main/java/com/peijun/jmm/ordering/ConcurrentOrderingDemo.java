@@ -2,6 +2,8 @@ package com.peijun.jmm.ordering;
 
 import org.openjdk.jcstress.annotations.*;
 import org.openjdk.jcstress.infra.results.IIII_Result;
+import org.openjdk.jcstress.infra.results.II_Result;
+import org.openjdk.jcstress.infra.results.I_Result;
 
 /**
  * @author: Dylan kwok GSGB
@@ -12,25 +14,28 @@ import org.openjdk.jcstress.infra.results.IIII_Result;
  * 测试有序性
  */
 @JCStressTest
-@Outcome(id = {"1", "4"}, expect = Expect.ACCEPTABLE, desc = "ok")
-@Outcome(id = "0", expect = Expect.ACCEPTABLE_INTERESTING, desc = "danger")
+@Outcome(id = {"0, 1", "2, 0", "1, 2"}, expect = Expect.ACCEPTABLE, desc = "okKKKKKKKKKKKKKK")
+@Outcome(id = {"0, 0", "2, 1"}, expect = Expect.ACCEPTABLE_INTERESTING, desc = "dangerRRRRRRRRRR")
 @State
 public class ConcurrentOrderingDemo {
     private int a = 0, b = 0;
     private int i, j;
 
     @Actor
-    public void actor1(IIII_Result r) {
+    public void actor1(I_Result r) {
+//        a = 1;
+//        i = b;
+//        r.r1 = a;
+//        r.r2 = i;
         a = 1;
-        i = b;
-        r.r1 = a;
-        r.r2 = i;
+        r.r1 = b;
     }
     @Actor
-    public void actor2(IIII_Result r) {
-        b = 1;
-        j = a;
-        r.r3 = b;
-        r.r4 = j;
+    public void actor2(I_Result r) {
+//        b = 1;
+//        j = a;
+//        r.r3 = b;
+//        r.r4 = j;
+        b = a;
     }
 }

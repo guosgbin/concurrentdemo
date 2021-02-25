@@ -15,7 +15,11 @@ public class ConcurrentVisibilityDemo {
     public static void main(String[] args) throws InterruptedException {
         // 配置完成 启动任务线程
         Thread taskThread = new Thread(() -> {
-            while (!init) { }
+            while (!init) {
+                int i = 1;
+                i= i++;
+//                System.out.println("好家伙，配置初始化好了，开始执行任务...");
+            }
             System.out.println("好家伙，配置初始化好了，开始执行任务...");
         });
 

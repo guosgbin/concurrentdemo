@@ -11,8 +11,8 @@ import org.openjdk.jcstress.infra.results.I_Result;
 @Outcome(id = {"0, 1", "1, 0", "1, 1"}, expect = Expect.ACCEPTABLE, desc = "NOT ORDERING")
 @Outcome(id = {"0, 0"}, expect = Expect.ACCEPTABLE_INTERESTING, desc = "HAD ORDERING")
 @State
-public class ConcurrentOrderingDemo {
-    private int a = 0, b = 0;
+public class ConcurrentOrderingDemo02 {
+    private volatile int a = 0, b = 0;
 
     @Actor
     public void actor1(II_Result r) {

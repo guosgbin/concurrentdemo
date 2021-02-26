@@ -24,21 +24,4 @@ public class Singleton {
         }
         return INSTANCE;
     }
-
-    public static void main(String[] args) throws InterruptedException {
-        Thread t1 = new Thread(() -> {
-            Singleton instance = Singleton.getInstance();
-            System.out.println(instance);
-        });
-
-        Thread t2 = new Thread(() -> {
-            Singleton instance = Singleton.getInstance();
-            System.out.println(instance);
-        });
-
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
-    }
 }

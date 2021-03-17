@@ -1,5 +1,6 @@
 package com.peijun.threadapi.priority;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PriorityDemo01 {
     private static volatile boolean isBreak = true;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         AtomicInteger count1 = new AtomicInteger(0);
         AtomicInteger count2 = new AtomicInteger(0);
         Thread t1 = new Thread(() -> {
@@ -34,5 +35,6 @@ public class PriorityDemo01 {
         System.out.println(count1);
         System.out.println(count2);
         System.out.println("结束...");
+        System.in.read(); // jstack去看下
     }
 }

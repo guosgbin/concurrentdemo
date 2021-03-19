@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 古之立大事者，不惟有超世之才，亦必有坚忍不拔之志——苏轼
  * <p>
- * 测试stop方法 不释放锁
+ * 测试stop方法 释放锁
  */
 public class StopDemo02 {
     private static final Object MONITOR = new Object();

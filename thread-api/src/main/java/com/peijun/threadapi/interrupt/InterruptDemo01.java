@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 古之立大事者，不惟有超世之才，亦必有坚忍不拔之志——苏轼
  *
- * 测试中断
+ * 测试中断 interrupt方法
  */
 public class InterruptDemo01 {
     private final static int LOOP_COUNT = 1000000000;

@@ -10,6 +10,7 @@ package com.peijun.waitnotify.guarded02;
  * 被保护的对象
  */
 public class GuardedObject {
+    // 守护的结果的ID
     private int guardedId;
     // 结果
     private Object result;

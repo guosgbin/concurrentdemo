@@ -26,9 +26,9 @@ public class Main {
             while (true) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
+                    Message take = queue.take();
                 } catch (InterruptedException e) {
                 }
-                Message take = queue.take();
             }
         }).start();
     }

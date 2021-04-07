@@ -2,6 +2,7 @@ package com.peijun.threadstatus;
 
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -13,11 +14,17 @@ import java.util.concurrent.TimeUnit;
  * 测试 线程的状态
  *
  * 1.【NEW】 --> 【RUNNABLE】 start方法 {@link #testNewToRunnable()}
+ *
  * 2.【RUNNABLE】 --> 【TERMINATED】 线程正常运行结束  {@link #testRunnableToTerminate01()}
  * 3.【RUNNABLE】 --> 【TERMINATED】 线程意外运行结束 {@link #testRunnableToTerminate02()}
- * 4.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】sleep(timeout)方法 {@link #testRunnableToTimeWaiting01()}
- * 5.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】wait(timeout)方法 {@link #testRunnableToTimeWaiting02()}
- * 6.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【BLOCKED】wait(timeout)方法 {@link #testRunnableToTimeWaiting03()}
+ *
+ * 4.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】sleep(long)方法 {@link #testRunnableToTimeWaiting01()}
+ *
+ * 5.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】wait(long)方法 {@link #testRunnableToTimeWaiting02()}
+ * 6.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【BLOCKED】wait(long)方法 {@link #testRunnableToTimeWaiting03()}
+ *
+ * 7.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】join(long)方法 {@link #testRunnableToTimeWaiting04()}
+ * 8.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【BLOCKED】join(long)方法 {@link #testRunnableToTimeWaiting05()}
  */
 public class ThreadStatusTest {
 
@@ -115,7 +122,7 @@ public class ThreadStatusTest {
     /**
      * 调用wait(timeout)方法
      *【RUNNABLE】 --> 【TIMED_WAITING】
-     * 注意，因为wait方法会释放锁，所以当调用wait(timeout)方法后，会根据当前线程是否再次争抢到锁来决定当前线程的状态。
+     * 注意，因为wait方法会释放锁，所以当调用wait(long)方法后，会根据当前线程是否再次争抢到锁来决定当前线程的状态。
      * - 抢到锁：-->【RUNNABLE】
      * - 未抢到锁：-->【BLOCKED】
      *
@@ -147,7 +154,7 @@ public class ThreadStatusTest {
     /**
      * 调用wait(timeout)方法
      *【RUNNABLE】 --> 【TIMED_WAITING】
-     * 注意，因为wait方法会释放锁，所以当调用wait(timeout)方法后，会根据当前线程是否再次争抢到锁来决定当前线程的状态。
+     * 注意，因为wait方法会释放锁，所以当调用wait(long)方法后，会根据当前线程是否再次争抢到锁来决定当前线程的状态。
      * - 抢到锁：-->【RUNNABLE】
      * - 未抢到锁：-->【BLOCKED】
      *
@@ -195,5 +202,109 @@ public class ThreadStatusTest {
         System.out.println("线程运行中 -> t2线程的状态：" + t2.getState());
         t1.join();
         t2.join();
+    }
+
+    /**
+     * 调用join(timeout)方法
+     *【RUNNABLE】 --> 【TIMED_WAITING】
+     * 注意，因为wait方法会释放锁，所以当调用join(timeout)方法后，会根据当前线程是否再次争抢到锁来决定当前线程的状态。
+     * - 抢到锁：-->【RUNNABLE】
+     * - 未抢到锁：-->【BLOCKED】
+     *
+     * 本方法测试 无争抢锁情况
+     */
+    @Test
+    public void testRunnableToTimeWaiting04() throws InterruptedException, IOException {
+        Thread t1 = new Thread(() -> {
+                try {
+                    System.out.println("t1线程开始运行...");
+                    for (int i = 0; i < 10000000; i++);
+                    // 线程t1运行1秒
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException ignored) {
+                }
+        }, "线程t1");
+
+        // t2线程等待t1线程执行完毕再去执行
+        Thread t2 = new Thread(() -> {
+                try {
+                    System.out.println("t2线程开始等待t1线程执行完毕...");
+                    t1.join(500);
+                    while (true) {
+
+                    }
+                } catch (InterruptedException ignored) {
+                }
+        }, "线程t2");
+
+        t1.start();
+        t2.start();
+        System.out.println("调用start方法后 -> t2线程的状态：" + t2.getState());
+        TimeUnit.MILLISECONDS.sleep(300);
+        System.out.println("调用t1.join(long)方法后 -> t2线程的状态：" + t2.getState());
+        TimeUnit.SECONDS.sleep(2);
+        System.out.println("等待超时后 -> t2线程的状态：" + t2.getState());
+        System.in.read();
+    }
+
+
+    /**
+     * 调用join(timeout)方法
+     *【RUNNABLE】 --> 【TIMED_WAITING】
+     * 注意，因为wait方法会释放锁，所以当调用join(timeout)方法后，会根据当前线程是否再次争抢到锁来决定当前线程的状态。
+     * - 抢到锁：-->【RUNNABLE】
+     * - 未抢到锁：-->【BLOCKED】
+     *
+     * 本方法测试 未抢到锁情况
+     */
+    @Test
+    public void testRunnableToTimeWaiting05() throws InterruptedException, IOException {
+        Thread t1 = new Thread(() -> {
+            try {
+                System.out.println("t1线程开始运行...");
+                for (int i = 0; i < 10000000; i++);
+                // 线程t1运行1秒
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException ignored) {
+            }
+        }, "线程t1");
+
+        // t2线程等待t1线程执行完毕再去执行
+        Thread t2 = new Thread(() -> {
+            try {
+                System.out.println("t2线程开始等待t1线程执行完毕...");
+                t1.join(500);
+                System.out.println("这句话打不出了");
+                while (true) {
+
+                }
+            } catch (InterruptedException ignored) {
+            }
+        }, "线程t2");
+
+        // t2线程等待t1线程执行完毕再去执行
+        Thread t3 = new Thread(() -> {
+            synchronized (t1) {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }, "线程t3");
+
+        t1.start();
+        t2.start();
+        System.out.println("调用start方法后 -> t2线程的状态：" + t2.getState());
+        TimeUnit.MILLISECONDS.sleep(100); // 让t2先运行
+        t3.start(); // 此线程是占用锁对象t1的
+        TimeUnit.MILLISECONDS.sleep(300);
+        System.out.println("调用t1.join(long)方法后 -> t2线程的状态：" + t2.getState());
+        TimeUnit.SECONDS.sleep(2);
+        System.out.println("因为join方法的加锁对象是调用者，也就是t1，而此时t1对象作为锁被t3线程拿着不放 -> t2线程的状态：" + t2.getState());
+        TimeUnit.SECONDS.sleep(6);
+        System.out.println("因 -> t2线程的状态：" + t2.getState());
+        System.in.read();
     }
 }

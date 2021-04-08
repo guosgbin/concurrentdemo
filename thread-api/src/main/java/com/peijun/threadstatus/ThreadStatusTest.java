@@ -3,34 +3,40 @@ package com.peijun.threadstatus;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.*;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
- * @author: Dylan kwok GSGB
- * @date: 2021/4/6 21:55
  * <p>
  * 古之立大事者，不惟有超世之才，亦必有坚忍不拔之志——苏轼
  * <p>
  * 测试 线程的状态
+ * <li>1.【NEW】 --> 【RUNNABLE】 start方法 {@link #testNewToRunnable()}</li>
+ * <br>
+ * <li>2.【RUNNABLE】 --> 【TERMINATED】 线程正常运行结束  {@link #testRunnableToTerminate01()}</li>
+ * <li>3.【RUNNABLE】 --> 【TERMINATED】 线程意外运行结束 {@link #testRunnableToTerminate02()}</li>
+ * <br>
+ * <li>4.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】sleep(long)方法 {@link #testRunnableToTimeWaiting01()}</li>
+ * <br>
+ * <li>5.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】wait(long)方法 {@link #testRunnableToTimeWaiting02()}</li>
+ * <li>6.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【BLOCKED】wait(long)方法 {@link #testRunnableToTimeWaiting03()}</li>
+ * <br>
+ * <li>7.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】join(long)方法 {@link #testRunnableToTimeWaiting04()}</li>
+ * <li>8.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【BLOCKED】join(long)方法 {@link #testRunnableToTimeWaiting05()}</li>
+ * <br>
+ * <li>9.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】parkNanos(long)方法 {@link #testRunnableToTimeWaiting06()}</li>
+ * <li>10.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】parkUntil(long)方法 {@link #testRunnableToTimeWaiting07()}</li>
  *
- * 1.【NEW】 --> 【RUNNABLE】 start方法 {@link #testNewToRunnable()}
- *
- * 2.【RUNNABLE】 --> 【TERMINATED】 线程正常运行结束  {@link #testRunnableToTerminate01()}
- * 3.【RUNNABLE】 --> 【TERMINATED】 线程意外运行结束 {@link #testRunnableToTerminate02()}
- *
- * 4.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】sleep(long)方法 {@link #testRunnableToTimeWaiting01()}
- *
- * 5.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】wait(long)方法 {@link #testRunnableToTimeWaiting02()}
- * 6.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【BLOCKED】wait(long)方法 {@link #testRunnableToTimeWaiting03()}
- *
- * 7.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】join(long)方法 {@link #testRunnableToTimeWaiting04()}
- * 8.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【BLOCKED】join(long)方法 {@link #testRunnableToTimeWaiting05()}
+ * @author: Dylan kwok GSGB
+ * @date: 2021/4/6 21:55
  */
 public class ThreadStatusTest {
 
     // ========================================
-    // 调用start方法时
     //【NEW】 --> 【RUNNABLE】
+    // 调用start方法时
     // ========================================
 
     /**
@@ -50,9 +56,11 @@ public class ThreadStatusTest {
         System.out.println("调用start方法后 -> 当前线程的状态：" + thread.getState());
     }
 
+    // ---------------------< 分割线 >---------------------
+
     // ========================================
-    // 调用start方法时
     //【RUNNABLE】 --> 【TERMINATED】
+    // 线程正常结束和意外结束
     // ========================================
 
     /**
@@ -94,6 +102,17 @@ public class ThreadStatusTest {
         TimeUnit.MICROSECONDS.sleep(100);
         System.out.println("线程意外退出 -> 当前线程的状态：" + thread.getState());
     }
+
+    // ---------------------< 分割线 >---------------------
+
+    // ========================================
+    //【RUNNABLE】 --> 【TIMED_WAITING】
+    // - sleep(long)
+    // - wait(long)
+    // - join(long)
+    // - LockSupport.parkNanos(long)
+    // - LockSupport.parkUntil(long)
+    // ========================================
 
     /**
      * 调用sleep方法 使线程的状态从 RUNNABLE 到 TIMED_WAITING  恢复运行后  又回到了【RUNNABLE】状态
@@ -307,4 +326,113 @@ public class ThreadStatusTest {
         System.out.println("因 -> t2线程的状态：" + t2.getState());
         System.in.read();
     }
+
+    /**
+     * parkNanos 单位 纳秒
+     * 测试 {@link java.util.concurrent.locks.LockSupport#parkNanos(long)}
+     * 该方法会让线程进入【TIMED_WAITING】状态
+     * 【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】
+     */
+    @Test
+    public void testRunnableToTimeWaiting06() throws Exception {
+        Thread t1 = new Thread(() -> {
+            LockSupport.parkNanos(100);
+            System.out.println("爷睡醒了...");
+            System.out.println("等待完毕后，t2线程的状态："+Thread.currentThread().getState());
+            while (true) {}
+        }, "测试线程");
+
+        t1.start();
+        System.out.println("调用start方法后 -> t1线程的状态：" + t1.getState());
+        TimeUnit.NANOSECONDS.sleep(100);
+        System.out.println("100纳秒后，t1线程的状态：" + t1.getState());
+        System.in.read();
+    }
+
+    /**
+     * parkUntil 单位 毫秒  等待从纪元时间到指定时间时间戳
+     * 也就是说 假如要等待到  2021年4月8日22:22:59  那就需要传入此时间的1970年的时间戳
+     *
+     * 测试 {@link java.util.concurrent.locks.LockSupport#parkUntil(long)}
+     * 该方法会让线程进入【TIMED_WAITING】状态
+     * 【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】
+     */
+    @Test
+    public void testRunnableToTimeWaiting07() throws Exception {
+        Thread t1 = new Thread(() -> {
+            // 获取当前时间后的5秒钟
+            Instant instant = Instant.now().plusSeconds(5);
+            long timestamp = instant.toEpochMilli();
+            System.out.println("等待截止时间: " + LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+            // 睡眠时间的1秒钟
+            System.out.println("睡眠前的时间："+ LocalDateTime.now());
+            LockSupport.parkUntil(timestamp);
+            System.out.println("睡醒大概时间："+LocalDateTime.now());
+            System.out.println("爷睡醒了...");
+            System.out.println("等待完毕后，t2线程的状态：" + Thread.currentThread().getState());
+            while (true) {
+            }
+        }, "测试线程");
+
+        t1.start();
+        System.out.println("调用start方法后 -> t1线程的状态：" + t1.getState());
+        TimeUnit.MILLISECONDS.sleep(500);
+        System.out.println("100纳秒后，t1线程的状态：" + t1.getState());
+        System.in.read();
+    }
+
+    // ---------------------< 分割线 >---------------------
+
+    // ========================================
+    //【RUNNABLE】 --> 【WAITING】
+    // - wait()
+    // - join()
+    // - LockSupport.park()
+    // ========================================
+
+    /**
+     * {@link Object#wait()}方法会让线程进入 无限等待 状态
+     * 当其他线程调用{@link Object#notify()}或者{@link Object#notifyAll()}会唤醒 无限等待的线程
+     * <li>假如拿到锁了 进入【RUNNABLE】</li>
+     * <li>假如未拿到锁 进入【BLOCK】</li>
+     */
+    @Test
+    public void testRunnableToWaiting01() throws Exception {
+        final Object monitor = new Object();
+
+        Thread t1 = new Thread(() -> {
+            synchronized (monitor) {
+                try {
+                    System.out.println("t1线程的状态:" + Thread.currentThread().getState());
+                    monitor.wait();
+                    System.out.println("t1爷被唤醒了，继续执行...");
+                    while (true) {
+                    }
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }, "测试线程");
+
+        Thread t2 = new Thread(() -> {
+            synchronized (monitor) {
+                try {
+                    monitor.notifyAll(); // 唤醒t1线程
+                    // 虽然唤醒了t1线程，但是此1秒钟还是占有锁，所以此时t1线程是阻塞状态
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        });
+
+        t1.start();
+        TimeUnit.SECONDS.sleep(1); //
+        System.out.println("线程t1的状态为: " + t1.getState());
+        t2.start();
+        TimeUnit.MILLISECONDS.sleep(500);
+        System.out.println("t2唤醒t1线程，但此时t2线程还占有锁，t1线程状态是：" + t1.getState());
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println("t2唤醒t1线程，且t2线程已经释放锁了，t1线程状态是：" + t1.getState());
+        System.in.read();
+    }
+
 }

@@ -3,6 +3,7 @@ package com.peijun.threadstatus;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.time.*;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -14,10 +15,10 @@ import java.util.concurrent.locks.LockSupport;
  * <p>
  * 测试 线程的状态
  * <li>1.【NEW】 --> 【RUNNABLE】 start方法 {@link #testNewToRunnable()}</li>
- * <br>
+ * =========================================================
  * <li>2.【RUNNABLE】 --> 【TERMINATED】 线程正常运行结束  {@link #testRunnableToTerminate01()}</li>
  * <li>3.【RUNNABLE】 --> 【TERMINATED】 线程意外运行结束 {@link #testRunnableToTerminate02()}</li>
- * <br>
+ * =========================================================
  * <li>4.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】sleep(long)方法 {@link #testRunnableToTimeWaiting01()}</li>
  * <br>
  * <li>5.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】wait(long)方法 {@link #testRunnableToTimeWaiting02()}</li>
@@ -28,6 +29,15 @@ import java.util.concurrent.locks.LockSupport;
  * <br>
  * <li>9.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】parkNanos(long)方法 {@link #testRunnableToTimeWaiting06()}</li>
  * <li>10.【RUNNABLE】 --> 【TIMED_WAITING】 --> 【RUNNABLE】parkUntil(long)方法 {@link #testRunnableToTimeWaiting07()}</li>
+ * =========================================================
+ * <li>11.【RUNNABLE】 --> 【WAITING】
+ *   <br>&emsp;             --> 【RUNNABLE】wait()方法 {@link #testRunnableToWaiting01()}
+ *   <br>&emsp;             --> 【BLOCKED】wait()方法 {@link #testRunnableToWaiting01()}</li>
+ * <br>
+ * <li>12.【RUNNABLE】 --> 【WAITING】
+ *   <br>&emsp;             --> 【RUNNABLE】join()方法 {@link #testRunnableToWaiting02()}
+ *   <br>&emsp;             --> 【BLOCKED】join()方法 </li>
+ * <li>13.【RUNNABLE】 --> 【WAITING】--> 【RUNNABLE】  park()方法 {@link #testRunnableToWaiting03()}</li>
  *
  * @author: Dylan kwok GSGB
  * @date: 2021/4/6 21:55
@@ -393,6 +403,7 @@ public class ThreadStatusTest {
     /**
      * {@link Object#wait()}方法会让线程进入 无限等待 状态
      * 当其他线程调用{@link Object#notify()}或者{@link Object#notifyAll()}会唤醒 无限等待的线程
+     * 【RUNNABLE】 --> 【WAITING】
      * <li>假如拿到锁了 进入【RUNNABLE】</li>
      * <li>假如未拿到锁 进入【BLOCK】</li>
      */
@@ -435,4 +446,72 @@ public class ThreadStatusTest {
         System.in.read();
     }
 
+    /**
+     * {@link Thread#join()}方法会让线程进入 无限等待 状态
+     * 当等待线程执行完毕后  调用线程根据拿锁情况  决定是否向下执行
+     * <li>假如拿到锁了 进入【RUNNABLE】</li>
+     * <li>假如未拿到锁 进入【BLOCK】</li>
+     * 此例子展示无争抢锁的情况， 争抢锁可以看上面的join有参方法的例子
+     *
+     * RUNNABLE】 --> 【WAITING】
+     *    <li>假如拿到锁了 进入【RUNNABLE】</li>
+     *    <li>假如未拿到锁 进入【BLOCK】</li>
+     */
+    @Test
+    public void testRunnableToWaiting02() throws Exception {
+        // 线程t1睡眠两秒
+        Thread t1 = new Thread(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(2);
+            } catch (InterruptedException ignored) {
+            }
+        }, "睡眠线程");
+
+        // 线程t2等待线程1执行完毕
+        Thread t2 = new Thread(() -> {
+            try {
+                System.out.println("线程t2开始执行，t2的状态为：" + Thread.currentThread().getState());
+                t1.join();
+                System.out.println("线程t1执行完毕，t2的状态为：" + Thread.currentThread().getState());
+            } catch (InterruptedException ignored) {
+            }
+        });
+
+        t1.start();
+        TimeUnit.MICROSECONDS.sleep(10);
+        t2.start();
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println("线程t1睡眠中，t2的状态为：" + t2.getState());
+        System.in.read();
+    }
+
+    /**
+     * {@link LockSupport#park()} 方法 假如线程没有许可证 会让当前线程挂起
+     * 在其他线程调用LockSupport.unpark(Thread thread)方法并且将当前线程作为参数时，调用LockSupport.park()方法而被阻塞的线程会返回。
+     * 如果其他线程调用了阻塞线程的interrupt()方法(中断线程)，设置了中断标志或者线程被虚假唤醒，则阻塞线程也会返回。
+     * 所以在调用LockSupport.park()方法时最好使用循环条件判断。
+     *
+     * 没有许可证情况：    【RUNNABLE】 --> 【WAITING】 --> 【RUNNABLE】
+     *
+     */
+    @Test
+    public void testRunnableToWaiting03() throws Exception {
+        // 线程t1睡眠两秒
+        Thread t1 = new Thread(() -> {
+            System.out.println("线程t1开始运行，状态为：" + Thread.currentThread().getState());
+            LockSupport.park();
+            System.out.println("线程t1被唤醒，状态为：" + Thread.currentThread().getState());
+        }, "睡眠线程");
+
+        // 线程t2等待线程1执行完毕
+        Thread t2 = new Thread(() -> {
+           LockSupport.unpark(t1);
+        });
+
+        t1.start();
+        TimeUnit.SECONDS.sleep(2);
+        t2.start();
+        System.out.println("线程t1被唤醒，t1的状态为：" + t1.getState());
+        System.in.read();
+    }
 }

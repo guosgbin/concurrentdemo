@@ -2,6 +2,9 @@ package com.peijun.threadstatus;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Time;
 import java.time.*;
@@ -38,6 +41,8 @@ import java.util.concurrent.locks.LockSupport;
  *   <br>&emsp;             --> 【RUNNABLE】join()方法 {@link #testRunnableToWaiting02()}
  *   <br>&emsp;             --> 【BLOCKED】join()方法 </li>
  * <li>13.【RUNNABLE】 --> 【WAITING】--> 【RUNNABLE】  park()方法 {@link #testRunnableToWaiting03()}</li>
+ * =========================================================
+ * <li>14.【RUNNABLE】 --> 【BLOCKED】   {@link #testRunnableToBlocked()}</li>
  *
  * @author: Dylan kwok GSGB
  * @date: 2021/4/6 21:55
@@ -514,4 +519,85 @@ public class ThreadStatusTest {
         System.out.println("线程t1被唤醒，t1的状态为：" + t1.getState());
         System.in.read();
     }
+
+    // ---------------------< 分割线 >---------------------
+
+    // ========================================
+    //【RUNNABLE】 --> 【BLOCKED】
+    // 未获取到锁
+    // ========================================
+
+    /**
+     * 【RUNNABLE】 --> 【BLOCKED】
+     * 未抢到锁
+     */
+    @Test
+    public void testRunnableToBlocked() throws Exception {
+        final Object monitor = new Object();
+        // 等待锁线程
+        Thread t1 = new Thread(() -> {
+            synchronized (monitor) {
+                while (true) {
+
+                }
+            }
+        }, "等待锁线程");
+        // 先占锁线程
+        Thread t2 = new Thread(() -> {
+            synchronized (monitor) {
+                try {
+                    System.out.println("t2线程占用锁2秒...");
+                    TimeUnit.SECONDS.sleep(2);
+                    System.out.println("t2线程退出释放锁...");
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }, "先占锁线程");
+
+        t2.start();
+        TimeUnit.MICROSECONDS.sleep(100);
+        t1.start();
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println("t1线程的状态：" + t1.getState());
+        TimeUnit.SECONDS.sleep(3);
+        System.out.println("t1线程的状态：" + t1.getState());
+        System.in.read();
+    }
+
+    // ---------------------< 分割线 >---------------------
+
+    // ========================================
+    // 测试阻塞式API 在Java层面的状态还是RUNNABLE
+    // ========================================
+
+    private static final String VIDEO_ABSOLUTE_PATH= "D:\\BaiduNetdiskDownload\\Office_Pro_Plus_2019+Project+Visio_x64_zh_CN_VL_2020-12.iso";
+
+    /**
+     * 测试阻塞式IO
+     */
+    @Test
+    public void testBlockApiStatus() throws Exception {
+        Thread t1 = new Thread(() -> {
+            try (FileInputStream is = new FileInputStream(VIDEO_ABSOLUTE_PATH)) {
+                LocalDateTime startTime = LocalDateTime.now();
+                System.out.println("时间:" + startTime + " 开始读取...线程的状态：" + Thread.currentThread().getState());
+                byte[] bytes = new byte[is.available()];
+                int read = is.read(bytes);
+                LocalDateTime endTime = LocalDateTime.now();
+                System.out.println("时间:" + endTime + " 读取完了...线程的状态：" + Thread.currentThread().getState());
+                System.out.println("子线程读取文件耗时：" + Duration.between(startTime, endTime).toMillis() + "毫秒");
+            } catch (Exception ignored) {
+            }
+        }, "读取本地文件线程");
+
+        t1.start();
+        TimeUnit.MILLISECONDS.sleep(500);
+        System.out.println("主线程打印t1线程的状态：" + t1.getState());
+        TimeUnit.MILLISECONDS.sleep(500);
+        System.out.println("主线程打印t1线程的状态：" + t1.getState());
+        System.in.read();
+
+    }
+
+
 }

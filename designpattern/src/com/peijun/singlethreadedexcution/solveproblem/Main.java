@@ -1,6 +1,4 @@
-package com.peijun.singleThreadedExcution.solveproblem;
-
-import java.util.concurrent.TimeUnit;
+package com.peijun.singlethreadedexcution.solveproblem;
 
 /**
  * @author: Dylan kwok GSGB

@@ -1,4 +1,4 @@
-package com.peijun.singleThreadedExcution.notuse;
+package com.peijun.singlethreadedexcution.use;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +14,10 @@ public class Gate {
     private String name = "NoName";
     private String address = "NoWhere";
 
-    public void pass(String name, String address) {
+    /**
+     * 改为同步方法
+     */
+    public synchronized void pass(String name, String address) {
         try {
             this.counter++;
             this.name = name;
@@ -37,6 +40,9 @@ public class Gate {
         }
     }
 
+    /**
+     * 改为同步方法
+     */
     public String toString() {
         return "第" + counter + "个:" + name + ", " + address;
     }

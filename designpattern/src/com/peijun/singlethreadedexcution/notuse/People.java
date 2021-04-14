@@ -1,4 +1,4 @@
-package com.peijun.singleThreadedExcution.notuse;
+package com.peijun.singlethreadedexcution.notuse;
 
 /**
  * @author: Dylan kwok GSGB

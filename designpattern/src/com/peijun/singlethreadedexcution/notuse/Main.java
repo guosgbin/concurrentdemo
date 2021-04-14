@@ -1,9 +1,9 @@
-package com.peijun.singleThreadedExcution.use;
+package com.peijun.singlethreadedexcution.notuse;
 
 /**
  * @author: Dylan kwok GSGB
  * @date: 2021/4/11 23:18
- * <2p>
+ * <p>
  * 古之立大事者，不惟有超世之才，亦必有坚忍不拔之志——苏轼
  */
 public class Main {

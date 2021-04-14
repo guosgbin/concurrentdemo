@@ -1,4 +1,4 @@
-package com.peijun.singleThreadedExcution.problem;
+package com.peijun.singlethreadedexcution.problem;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,4 +1,4 @@
-package com.peijun.singleThreadedExcution.problem;
+package com.peijun.singlethreadedexcution.problem;
 
 /**
  * @author: Dylan kwok GSGB

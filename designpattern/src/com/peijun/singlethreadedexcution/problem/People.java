@@ -1,7 +1,4 @@
-package com.peijun.singleThreadedExcution.problem;
-
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
+package com.peijun.singlethreadedexcution.problem;
 
 /**
  * @author: Dylan kwok GSGB

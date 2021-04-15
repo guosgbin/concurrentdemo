@@ -1,4 +1,4 @@
-package com.peijun.guardedsuspension.demo01;
+package com.peijun.guardedsuspension.basic;
 
 import java.util.LinkedList;
 import java.util.Queue;

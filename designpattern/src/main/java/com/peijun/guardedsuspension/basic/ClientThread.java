@@ -1,4 +1,4 @@
-package com.peijun.guardedsuspension.demo01;
+package com.peijun.guardedsuspension.basic;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;

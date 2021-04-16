@@ -1,4 +1,4 @@
-package com.peijun.balking;
+package com.peijun.balking.autosave;
 
 /**
  * @author: Dylan kwok GSGB
@@ -9,7 +9,7 @@ package com.peijun.balking;
 public class Main {
     public static void main(String[] args) {
         Data data = new Data("data.txt" ,"(empty)");
-        new ChangerThread("ChangerThread", data).start();
-        new SaverThread("SaverThread", data).start();
+        new ChangerThread("码农手动ctrl+s了", data).start();
+        new SaverThread("IDEA自动保存线程", data).start();
     }
 }

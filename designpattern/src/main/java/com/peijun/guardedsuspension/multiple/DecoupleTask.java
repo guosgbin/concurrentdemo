@@ -21,16 +21,16 @@ public class DecoupleTask {
 
     // 生成自增ID
     public static Integer nextQueueId() {
-        return queueId.incrementAndGet();
+        return queueId.getAndIncrement();
     }
 
     // 根据守护对象的ID，获取守护对象
-    public MessageQueue getQueueById(Integer queueId) {
+    public static MessageQueue getQueueById(Integer queueId) {
         return queueMap.remove(queueId);
     }
 
     // 获取所有守护对象的ID
-    public Set<Integer> getAllQueueId() {
+    public static Set<Integer> getAllQueueId() {
         return queueMap.keySet();
     }
 

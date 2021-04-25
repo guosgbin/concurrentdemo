@@ -24,6 +24,9 @@ public class ShareData {
         }
     }
 
+    /**
+     * 读操作，加读锁
+     */
     public char[] read() throws InterruptedException {
         lock.readLock();
         try {
@@ -41,15 +44,8 @@ public class ShareData {
     }
 
     /**
-     * 模拟耗时操作
+     * 写操作，加写锁
      */
-    private void sleep(long millis) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(millis);
-        } catch (InterruptedException ignored) {
-        }
-    }
-
     public void write(char c) throws InterruptedException {
         lock.writeLock();
         try {
@@ -63,6 +59,16 @@ public class ShareData {
         for (int i = 0; i < buffer.length; i++) {
             buffer[i] = c;
             sleep(100);
+        }
+    }
+
+    /**
+     * 模拟耗时操作
+     */
+    private void sleep(long millis) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(millis);
+        } catch (InterruptedException ignored) {
         }
     }
 }

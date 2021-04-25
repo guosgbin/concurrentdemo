@@ -17,12 +17,12 @@ import java.util.concurrent.TimeUnit;
 public class WriterThread extends Thread{
     private static final Random random = new Random();
     private final ShareData shareData;
-    private final String filler;
+    private final String text;
     private int index = 0;
 
-    public WriterThread(ShareData shareData, String filler) {
+    public WriterThread(ShareData shareData, String text) {
         this.shareData = shareData;
-        this.filler = filler;
+        this.text = text;
     }
 
     @Override
@@ -38,9 +38,9 @@ public class WriterThread extends Thread{
     }
 
     private char nextchar() {
-        char c = filler.charAt(index);
+        char c = text.charAt(index);
         index++;
-        if (index >= filler.length()) {
+        if (index >= text.length()) {
             index = 0;
         }
         return c;

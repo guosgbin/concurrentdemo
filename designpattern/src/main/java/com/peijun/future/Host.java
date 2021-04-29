@@ -21,7 +21,12 @@ public class Host {
         FutureData future = new FutureData();
         // 创建一个新线程去处理任务
         new Thread(() -> {
-
+            // 委托给RealData处理任务
+            RealData realData = new RealData(taskDesc);
+            // 任务处理完成后，就将产生的realData结果设置到future中
+            future.setRealData(realData);
         }).start();
+        // 返回future
+        return future;
     }
 }

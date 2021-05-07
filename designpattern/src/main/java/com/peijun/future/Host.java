@@ -16,7 +16,7 @@ package com.peijun.future;
  */
 public class Host {
     public Data request(String taskDesc) {
-        System.out.println("亲");
+        System.out.println("接收到任务了");
         // 创建FutureData实例
         FutureData future = new FutureData();
         // 创建一个新线程去处理任务

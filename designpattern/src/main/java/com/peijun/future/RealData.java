@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 古之立大事者，不惟有超世之才，亦必有坚忍不拔之志——苏轼
  */
-public class RealData {
+public class RealData implements Data{
     private String taskDesc;
     private Random random = new Random();
 

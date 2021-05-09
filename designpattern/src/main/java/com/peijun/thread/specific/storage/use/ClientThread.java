@@ -16,6 +16,7 @@ public class ClientThread extends Thread{
 
     public void run() {
         System.out.println(getName() + " 开始...");
+        Log.println(Thread.currentThread().getName()+ " 666");
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException ignored) {

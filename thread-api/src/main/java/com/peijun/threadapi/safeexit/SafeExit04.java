@@ -25,8 +25,9 @@ public class SafeExit04 {
             System.out.println("线程1结束运行...");
         }
 
-        public void shutdown() {
+        public void shutdown(Thread thread) {
             exitFlag = true;
+            thread.interrupt();
         }
     }
 
@@ -36,7 +37,7 @@ public class SafeExit04 {
         thread.start();
         TimeUnit.SECONDS.sleep(2);
         System.out.println("关闭前");
-        task.shutdown();
+        task.shutdown(thread);
         TimeUnit.SECONDS.sleep(1);
         System.out.println("主线程退出...");
     }

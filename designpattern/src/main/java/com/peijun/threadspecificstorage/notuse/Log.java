@@ -1,4 +1,4 @@
-package com.peijun.thread.specific.storage.notuse;
+package com.peijun.threadspecificstorage.notuse;
 
 import java.io.FileWriter;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.peijun.thread.specific.storage.use;
+package com.peijun.threadspecificstorage.use;
 
 import java.io.FileWriter;
 import java.io.IOException;

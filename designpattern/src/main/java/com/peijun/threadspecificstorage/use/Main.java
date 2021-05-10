@@ -1,4 +1,4 @@
-package com.peijun.thread.specific.storage.use;
+package com.peijun.threadspecificstorage.use;
 
 /**
  * @author: Dylan kwok GSGB

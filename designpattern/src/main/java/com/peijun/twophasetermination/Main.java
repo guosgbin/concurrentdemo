@@ -1,4 +1,4 @@
-package com.peijun.two.phase.termination;
+package com.peijun.twophasetermination;
 
 import java.util.concurrent.TimeUnit;
 

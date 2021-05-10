@@ -1,6 +1,4 @@
-package com.peijun.thread.specific.storage.use;
-
-import java.util.concurrent.ThreadLocalRandom;
+package com.peijun.threadspecificstorage.use;
 
 /**
  * @author: Dylan kwok GSGB

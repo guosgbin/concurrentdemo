@@ -12,7 +12,19 @@ package com.peijun.activeobject.activeobject;
  */
 public interface ActiveObject {
 
-    public abstract Result<String> makeString(int count, char fillchar);
+    /**
+     * 创建字符串
+     *
+     * @param count
+     * @param fillchar
+     * @return
+     */
+    Result<String> makeString(int count, char fillchar);
 
-    public abstract void displayString(String string);
+    /**
+     * 显示字符串
+     *
+     * @param string
+     */
+    void displayString(String string);
 }

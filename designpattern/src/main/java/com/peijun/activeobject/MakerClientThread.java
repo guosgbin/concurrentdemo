@@ -16,6 +16,7 @@ public class MakerClientThread extends Thread {
     private final char fillchar;
 
     public MakerClientThread(String name, ActiveObject activeObject) {
+        super(name);
         this.activeObject = activeObject;
         this.fillchar = name.charAt(0);
     }

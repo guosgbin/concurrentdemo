@@ -14,6 +14,6 @@ public class Main {
         ActiveObject activeObject = ActiveObjectFactory.createActiveObject();
         new MakerClientThread("Alice", activeObject).start();
         new MakerClientThread("Bobby", activeObject).start();
-        new MakerClientThread("Chris", activeObject).start();
+        new DisplayClientThread("Chris", activeObject).start();
     }
 }

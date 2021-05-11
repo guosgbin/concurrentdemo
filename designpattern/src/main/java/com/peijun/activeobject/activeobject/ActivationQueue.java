@@ -5,8 +5,11 @@ package com.peijun.activeobject.activeobject;
  * @date: 2021/5/10 23:15
  * <p>
  * 古之立大事者，不惟有超世之才，亦必有坚忍不拔之志——苏轼
+ *
+ * 此角色是生产者消费者中的Channel角色，用于存储请求(request)
  */
 class ActivationQueue {
+    // 保存的请求的最大数量
     private static final int MAX_METHOD_REQUEST = 100;
     private final MethodRequest[] requestQueue;
     private int tail; // 下次putRequest的位置
